@@ -36,7 +36,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@dynatrace/openkit-js": "^1.4.0"
+    "@dynatrace/openkit-js": "^4.2.0"
   },
   "devDependencies": {
     "eslint": "^8.0.0",
