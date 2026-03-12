@@ -15,7 +15,7 @@
  * 4. Provides next steps for instrumentation
  * 
  * Prerequisites:
- * - Dynatrace API token with scope: settings.write, settings.read
+ * - Dynatrace API token with scope: Any valid API token (e.g., entities.read, settings.read, or DataExport)
  * - Access to your Dynatrace environment
  */
 
@@ -161,9 +161,11 @@ async function runSetup() {
  */
 function validateConnection(tenant, apiToken) {
   return new Promise((resolve) => {
+    // Try the /api/v2/settings/objects endpoint which only needs basic access
+    // This is more forgiving than /api/v2/metrics
     const options = {
       hostname: `${tenant}.sprint.dynatracelabs.com`,
-      path: '/api/v2/metrics',
+      path: '/api/v2/settings/schemas?pageSize=1',
       method: 'GET',
       headers: {
         'Authorization': `Api-Token ${apiToken}`,
@@ -172,14 +174,44 @@ function validateConnection(tenant, apiToken) {
     };
 
     const req = https.request(options, (res) => {
-      resolve(res.statusCode === 200);
+      let data = '';
+      
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      res.on('end', () => {
+        if (res.statusCode === 200) {
+          resolve(true);
+        } else if (res.statusCode === 401) {
+          console.error('\n⚠️  Authentication failed. Please check:');
+          console.error('   - Token format is correct (starts with dt0c01)');
+          console.error('   - Token has not expired');
+          console.error('   - Token has at least one permission scope\n');
+          resolve(false);
+        } else if (res.statusCode === 403) {
+          console.warn('\n⚠️  Token validated but has limited permissions.');
+          console.warn('   This is OK - we can still proceed with Custom Application setup.\n');
+          resolve(true); // Proceed anyway since token is valid
+        } else {
+          console.error(`\n⚠️  Unexpected response code: ${res.statusCode}`);
+          console.error(`   Response: ${data}\n`);
+          resolve(false);
+        }
+      });
     });
 
-    req.on('error', () => {
+    req.on('error', (err) => {
+      console.error('\n⚠️  Network error:', err.message);
+      console.error('   - Check your internet connection');
+      console.error('   - Verify tenant URL is correct\n');
       resolve(false);
     });
 
     req.setTimeout(10000, () => {
+      console.error('\n⚠️  Connection timeout (10 seconds)');
+      console.error('   - Network may be slow or blocked');
+      console.error('   - Firewall might be blocking the connection\n');
       req.destroy();
       resolve(false);
     });

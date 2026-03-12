@@ -5,7 +5,7 @@
 ### ✅ Prerequisites
 - Node.js installed
 - Dynatrace environment access
-- API token with `settings.write` and `settings.read` permissions
+- API token (any valid token - setup wizard only validates connection)
 
 ---
 
