@@ -15,7 +15,8 @@
  * 4. Provides next steps for instrumentation
  * 
  * Prerequisites:
- * - Dynatrace API token with scope: Any valid API token (e.g., entities.read, settings.read, or DataExport)
+ * - Dynatrace API token with scopes: WriteConfig, ReadConfig (to create applications)
+ *   - Or if token has limited permissions: DataExport, entities.read, or settings.read (for validation only)
  * - Access to your Dynatrace environment
  */
 
@@ -73,24 +74,32 @@ async function runSetup() {
     const industry = await question('Industry (e.g., Healthcare, Finance, Retail): ');
     const applicationVersion = await question('Application Version (default: 1.0.0): ') || '1.0.0';
     
-    // Step 3: Generate configuration
-    console.log('\n\n📋 Step 3: Custom Application Details');
+    // Step 3: Create Custom Application via API
+    console.log('\n\n📋 Step 3: Creating Custom Application');
     console.log('-'.repeat(70));
-    console.log('\n⚠️  Manual Step Required:');
-    console.log('\nPlease create a Custom Application in Dynatrace:');
-    console.log(`  1. Navigate to: ${tenantUrl}/ui/apps/dynatrace.classic.custom.applications`);
-    console.log('  2. Click: "Create custom application"');
-    console.log(`  3. Name: "${businessName} - ${applicationName}"`);
-    console.log('  4. Choose an appropriate icon');
-    console.log('  5. Click: "Monitor custom application"');
-    console.log('  6. Open: "Instrumentation wizard"');
-    console.log('  7. Select: "JavaScript"\n');
     
-    const wait = await question('Press ENTER when you have completed the above steps...');
+    const appFullName = `${businessName} - ${applicationName}`;
+    console.log(`\n🔧 Creating application: "${appFullName}"`);
+    console.log('   Using Dynatrace Configuration API...\n');
     
-    console.log('\nFrom the Instrumentation wizard, copy these values:\n');
-    const applicationId = await question('Application ID (e.g., CUSTOM_APPLICATION-1234567890ABCDEF): ');
-    const beaconUrl = await question(`Beacon URL (default: ${tenantUrl}/mbeacon): `) || `${tenantUrl}/mbeacon`;
+    let applicationId;
+    try {
+      applicationId = await createMobileApplication(tenant, apiToken, appFullName, 'CUSTOM_APPLICATION');
+    } catch (error) {
+      console.error('\n⚠️  Failed to create application via API.');
+      console.error('   You may need to create it manually or verify token permissions.\n');
+      
+      // Fallback to manual input
+      console.log('📝 Please create the application manually:');
+      console.log(`   1. Navigate to: ${tenantUrl}/ui/apps/dynatrace.classic.applications`);
+      console.log(`   2. Create a Mobile/Custom application named: "${appFullName}"`);
+      console.log('   3. Copy the Application ID\n');
+      
+      applicationId = await question('Enter Application ID (e.g., CUSTOM_APPLICATION-ABC123XYZ): ');
+    }
+    
+    const beaconUrl = `${tenantUrl}/mbeacon`;
+    console.log(`\n✅ Beacon URL: ${beaconUrl}`);
     
     // Step 4: Create configuration file
     const config = {
@@ -216,6 +225,93 @@ function validateConnection(tenant, apiToken) {
       resolve(false);
     });
 
+    req.end();
+  });
+}
+
+/**
+ * Create Mobile/Custom Application via Dynatrace Configuration API
+ * Uses: POST /api/config/v1/applications/mobile
+ */
+function createMobileApplication(tenant, apiToken, appName, appType = 'CUSTOM_APPLICATION') {
+  return new Promise((resolve, reject) => {
+    const requestBody = JSON.stringify({
+      name: appName,
+      applicationType: appType,
+      costControlUserSessionPercentage: 100,
+      loadActionKeyPerformanceMetric: 'VISUALLY_COMPLETE',
+      xhrActionKeyPerformanceMetric: 'VISUALLY_COMPLETE',
+      customActionApdexSettings: {
+        frustratingFallbackThreshold: 12000,
+        frustratingThreshold: 12000,
+        toleratedFallbackThreshold: 3000,
+        toleratedThreshold: 3000
+      },
+      loadActionApdexSettings: {
+        frustratingFallbackThreshold: 12000,
+        frustratingThreshold: 12000,
+        toleratedFallbackThreshold: 3000,
+        toleratedThreshold: 3000
+      },
+      xhrActionApdexSettings: {
+        frustratingFallbackThreshold: 12000,
+        frustratingThreshold: 12000,
+        toleratedFallbackThreshold: 3000,
+        toleratedThreshold: 3000
+      }
+    });
+
+    const options = {
+      hostname: `${tenant}.sprint.dynatracelabs.com`,
+      path: '/api/config/v1/applications/mobile',
+      method: 'POST',
+      headers: {
+        'Authorization': `Api-Token ${apiToken}`,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(requestBody)
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      res.on('end', () => {
+        if (res.statusCode === 201 || res.statusCode === 200) {
+          const response = JSON.parse(data);
+          console.log('✅ Custom Application created successfully!');
+          console.log(`   Application ID: ${response.id}`);
+          resolve(response.id);
+        } else {
+          console.error(`\n❌ Failed to create application (HTTP ${res.statusCode})`);
+          console.error(`   Response: ${data}`);
+          
+          if (res.statusCode === 401 || res.statusCode === 403) {
+            console.error('\n⚠️  Token requires these permissions:');
+            console.error('   - WriteConfig (Create and edit monitoring configurations)');
+            console.error('   - Or DataExport, settings.write, or ReadWrite\n');
+          }
+          
+          reject(new Error(`HTTP ${res.statusCode}: ${data}`));
+        }
+      });
+    });
+
+    req.on('error', (err) => {
+      console.error('\n❌ Network error creating application:', err.message);
+      reject(err);
+    });
+
+    req.setTimeout(15000, () => {
+      console.error('\n❌ Request timeout (15 seconds)');
+      req.destroy();
+      reject(new Error('Timeout'));
+    });
+
+    req.write(requestBody);
     req.end();
   });
 }
