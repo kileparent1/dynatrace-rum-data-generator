@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "businessName": "Harvard Pilgrim",
+    "applicationName": "Member Portal",
+    "industry": "Healthcare",
+    "createdDate": "2026-03-12T11:33:15.626Z",
+    "configVersion": "1.0.0"
+  },
+  "dynatrace": {
+    "tenant": "fzw9231h",
+    "tenantUrl": "https://fzw9231h.sprint.dynatracelabs.com",
+    "applicationId": "APPLICATION-71CFB6C19664BCC0",
+    "beaconUrl": "https://fzw9231h.sprint.dynatracelabs.com/mbeacon",
+    "applicationVersion": "1.0.0"
+  },
+  "openkit": {
+    "operatingSystem": "Windows 10",
+    "manufacturer": "Harvard Pilgrim",
+    "modelId": "Member Portal_v1.0.0",
+    "logLevel": "INFO"
+  },
+  "business": {}
+}

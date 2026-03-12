@@ -28,8 +28,16 @@ const path = require('path');
 let OpenKit;
 try {
   const openKitModule = require('@dynatrace/openkit-js');
-  OpenKit = openKitModule.OpenKitBuilder || openKitModule.DynatraceOpenKitBuilder;
-  console.log('✅ OpenKit SDK loaded successfully');
+  
+  // Try different export names (API changed between versions)
+  OpenKit = openKitModule.OpenKitBuilder || 
+            openKitModule.DynatraceOpenKitBuilder || 
+            openKitModule.default ||
+            openKitModule;
+  
+  if (OpenKit) {
+    console.log('✅ OpenKit SDK loaded successfully');
+  }
 } catch (error) {
   console.warn('⚠️  OpenKit SDK not found. Install with: npm install @dynatrace/openkit-js');
   console.warn('Running in MOCK mode for demonstration...\n');
@@ -102,16 +110,29 @@ function validateConfig(config) {
 function createOpenKit(config, deviceId) {
   if (OpenKit) {
     // Real OpenKit implementation
-    return new OpenKit(
-      config.dynatrace.beaconUrl,
-      config.dynatrace.applicationId,
-      deviceId
-    )
-      .withApplicationVersion(config.dynatrace.applicationVersion)
-      .withOperatingSystem(config.openkit.operatingSystem)
-      .withManufacturer(config.openkit.manufacturer)
-      .withModelID(config.openkit.modelId)
-      .build();
+    console.log('🔧 Initializing OpenKit SDK...');
+    
+    try {
+      // OpenKit v4+ uses lowercase 'd' in withModelId
+      const openKitInstance = new OpenKit(
+        config.dynatrace.beaconUrl,
+        config.dynatrace.applicationId,
+        deviceId
+      )
+        .withApplicationVersion(config.dynatrace.applicationVersion)
+        .withOperatingSystem(config.openkit.operatingSystem)
+        .withManufacturer(config.openkit.manufacturer)
+        .withModelId(config.openkit.modelId) // Note: lowercase 'd' in v4+
+        .build();
+      
+      console.log('✅ OpenKit initialized successfully');
+      return openKitInstance;
+      
+    } catch (error) {
+      console.error('❌ OpenKit initialization failed:', error.message);
+      console.warn('⚠️  Falling back to mock mode...\n');
+      return new MockOpenKit(config, deviceId);
+    }
   } else {
     // Mock implementation for testing without SDK
     return new MockOpenKit(config, deviceId);
