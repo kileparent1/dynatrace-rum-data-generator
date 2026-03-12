@@ -48,14 +48,34 @@ async function runSetup() {
     // Step 1: Get Dynatrace environment details
     console.log('\n📋 Step 1: Dynatrace Environment Configuration');
     console.log('-'.repeat(70));
+    console.log('\nEnter your Dynatrace environment URL (one of these formats):');
+    console.log('  • https://abc12345.live.dynatrace.com');
+    console.log('  • https://abc12345.apps.dynatrace.com');
+    console.log('  • https://abc12345.sprint.dynatracelabs.com');
+    console.log('  • Or just tenant ID if using .live.dynatrace.com (e.g., abc12345)\n');
     
-    const tenant = await question('Enter your Dynatrace tenant (e.g., abc12345): ');
-    const tenantUrl = `https://${tenant}.sprint.dynatracelabs.com`;
+    const tenantInput = await question('Dynatrace environment: ');
+    
+    // Parse tenant URL
+    let tenantUrl, tenant;
+    if (tenantInput.startsWith('http://') || tenantInput.startsWith('https://')) {
+      // Full URL provided
+      tenantUrl = tenantInput.replace(/\/$/, ''); // Remove trailing slash
+      const urlMatch = tenantUrl.match(/https?:\/\/([^.]+)\./);
+      tenant = urlMatch ? urlMatch[1] : tenantInput;
+    } else {
+      // Just tenant ID provided, assume .live.dynatrace.com
+      tenant = tenantInput;
+      tenantUrl = `https://${tenant}.live.dynatrace.com`;
+    }
+    
+    console.log(`\nUsing: ${tenantUrl}`);
+    
     const apiToken = await question('Enter your Dynatrace API token: ');
     
     // Validate connection
     console.log('\n🔍 Validating connection to Dynatrace...');
-    const isValid = await validateConnection(tenant, apiToken);
+    const isValid = await validateConnection(tenantUrl, apiToken);
     
     if (!isValid) {
       console.error('\n❌ Failed to connect to Dynatrace. Please check your credentials.');
@@ -84,7 +104,7 @@ async function runSetup() {
     
     let applicationId;
     try {
-      applicationId = await createMobileApplication(tenant, apiToken, appFullName, 'CUSTOM_APPLICATION');
+      applicationId = await createMobileApplication(tenantUrl, apiToken, appFullName, 'CUSTOM_APPLICATION');
     } catch (error) {
       console.error('\n⚠️  Failed to create application via API.');
       console.error('   You may need to create it manually or verify token permissions.\n');
@@ -101,6 +121,9 @@ async function runSetup() {
     const beaconUrl = `${tenantUrl}/mbeacon`;
     console.log(`\n✅ Beacon URL: ${beaconUrl}`);
     
+    // Extract tenant ID for config (backwards compatibility)
+    const tenantId = tenant || new URL(tenantUrl).hostname.split('.')[0];
+    
     // Step 4: Create configuration file
     const config = {
       metadata: {
@@ -111,7 +134,7 @@ async function runSetup() {
         configVersion: '1.0.0'
       },
       dynatrace: {
-        tenant: tenant,
+        tenant: tenantId,
         tenantUrl: tenantUrl,
         applicationId: applicationId,
         beaconUrl: beaconUrl,
@@ -168,12 +191,16 @@ async function runSetup() {
 /**
  * Validate connection to Dynatrace
  */
-function validateConnection(tenant, apiToken) {
+function validateConnection(tenantUrl, apiToken) {
   return new Promise((resolve) => {
+    // Parse the URL to get hostname
+    const url = new URL(tenantUrl);
+    const hostname = url.hostname;
+    
     // Try the /api/v2/settings/objects endpoint which only needs basic access
     // This is more forgiving than /api/v2/metrics
     const options = {
-      hostname: `${tenant}.sprint.dynatracelabs.com`,
+      hostname: hostname,
       path: '/api/v2/settings/schemas?pageSize=1',
       method: 'GET',
       headers: {
@@ -233,8 +260,12 @@ function validateConnection(tenant, apiToken) {
  * Create Mobile/Custom Application via Dynatrace Configuration API
  * Uses: POST /api/config/v1/applications/mobile
  */
-function createMobileApplication(tenant, apiToken, appName, appType = 'CUSTOM_APPLICATION') {
+function createMobileApplication(tenantUrl, apiToken, appName, appType = 'CUSTOM_APPLICATION') {
   return new Promise((resolve, reject) => {
+    // Parse the URL to get hostname
+    const url = new URL(tenantUrl);
+    const hostname = url.hostname;
+    
     const requestBody = JSON.stringify({
       name: appName,
       applicationType: appType,
@@ -262,7 +293,7 @@ function createMobileApplication(tenant, apiToken, appName, appType = 'CUSTOM_AP
     });
 
     const options = {
-      hostname: `${tenant}.sprint.dynatracelabs.com`,
+      hostname: hostname,
       path: '/api/config/v1/applications/mobile',
       method: 'POST',
       headers: {

@@ -10,7 +10,7 @@
   "dynatrace": {
     "tenant": "fzw9231h",
     "tenantUrl": "https://fzw9231h.sprint.dynatracelabs.com",
-    "applicationId": "CUSTOM_APPLICATION-A1B2C3D4E5F6G7H8",
+    "applicationId": "CUSTOM_APPLICATION-2EBA8ECA90C74ECC",
     "beaconUrl": "https://fzw9231h.sprint.dynatracelabs.com/mbeacon",
     "applicationVersion": "2.1.0"
   },

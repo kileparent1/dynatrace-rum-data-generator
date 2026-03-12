@@ -25,7 +25,7 @@ const fs = require('fs');
 const path = require('path');
 
 // OpenKit import - will be available after: npm install @dynatrace/openkit-js
-let OpenKit;
+let OpenKit, LogLevel;
 try {
   const openKitModule = require('@dynatrace/openkit-js');
   
@@ -34,6 +34,9 @@ try {
             openKitModule.DynatraceOpenKitBuilder || 
             openKitModule.default ||
             openKitModule;
+  
+  // Import LogLevel for debug logging
+  LogLevel = openKitModule.LogLevel;
   
   if (OpenKit) {
     console.log('✅ OpenKit SDK loaded successfully');
@@ -111,6 +114,10 @@ function createOpenKit(config, deviceId) {
   if (OpenKit) {
     // Real OpenKit implementation
     console.log('🔧 Building OpenKit instance...');
+    console.log(`   Beacon URL: ${config.dynatrace.beaconUrl}`);
+    console.log(`   Application ID: ${config.dynatrace.applicationId}`);
+    console.log(`   Device ID: ${deviceId}`);
+    console.log(`   🔍 Enabling DEBUG logging to diagnose connection...\n`);
     
     try {
       // OpenKit v4+ uses lowercase 'd' in withModelId
@@ -123,6 +130,7 @@ function createOpenKit(config, deviceId) {
         .withOperatingSystem(config.openkit.operatingSystem)
         .withManufacturer(config.openkit.manufacturer)
         .withModelId(config.openkit.modelId) // Note: lowercase 'd' in v4+
+        .withLogLevel(LogLevel ? LogLevel.Debug : 10) // Enable debug logging
         .build();
       
       console.log('✓ OpenKit instance created (waiting for initialization...)');
@@ -130,6 +138,7 @@ function createOpenKit(config, deviceId) {
       
     } catch (error) {
       console.error('❌ Failed to create OpenKit instance:', error.message);
+      console.error('   Stack:', error.stack);
       console.warn('⚠️  Falling back to mock mode...\n');
       return new MockOpenKit(config, deviceId);
     }
@@ -150,7 +159,7 @@ class MockOpenKit {
   }
 
   waitForInit(callback, timeout) {
-    console.log(`[MOCK OpenKit] Waiting for initialization (${timeout}ms)...`);
+    console.log('[MOCK OpenKit] Waiting for initialization...');
     setTimeout(() => {
       console.log('[MOCK OpenKit] ✓ Initialization complete');
       callback(true);
@@ -254,9 +263,28 @@ async function simulateUserSession(config, userProfile, journey) {
   const openKit = createOpenKit(config, deviceId);
 
   return new Promise((resolve) => {
-    const timeout = 10000;
+    const initTimeout = 30000; // Increased to 30 seconds
+    let initComplete = false;
+    
+    // Set a manual timeout
+    const timeoutHandle = setTimeout(() => {
+      if (!initComplete) {
+        console.error('❌ OpenKit initialization timed out after 30 seconds');
+        console.error('   Possible issues:');
+        console.error('   1. Dynatrace Custom Application may not be enabled');
+        console.error('   2. Application ID mismatch between config and Dynatrace');
+        console.error('   3. Network proxy or firewall blocking HTTPS connections');
+        console.error('   4. Dynatrace tenant URL incorrect\n');
+        console.log('   💡 Tip: Check in Dynatrace UI -> Frontend -> Mobile & custom applications');
+        console.log('            Verify the application exists and is enabled\n');
+        resolve(false);
+      }
+    }, initTimeout);
     
     openKit.waitForInit(async (success) => {
+      initComplete = true;
+      clearTimeout(timeoutHandle);
+      
       if (!success) {
         console.error('❌ OpenKit initialization failed (unable to connect to Dynatrace beacon)');
         console.error('   Please verify:');
@@ -338,7 +366,7 @@ async function simulateUserSession(config, userProfile, journey) {
         openKit.shutdown();
         resolve(false);
       }
-    }, timeout);
+    }, initTimeout);
   });
 }
 
