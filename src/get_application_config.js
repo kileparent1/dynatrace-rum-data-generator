@@ -9,7 +9,7 @@ const https = require('https');
 // Configuration
 const tenantUrl = 'https://YOUR_TENANT.live.dynatrace.com';
 const applicationId = 'CUSTOM_APPLICATION-XXXXXXXXXXXXXXXX';
-const apiToken = 'YOUR_API_TOKEN_HERE';
+const apiToken = 'YOUR_API_TOKEN_HERE'; // Replace with your Dynatrace API token
 
 console.log('\n🔍 Fetching Mobile Application Configuration\n');
 console.log(`Application ID: ${applicationId}`);
