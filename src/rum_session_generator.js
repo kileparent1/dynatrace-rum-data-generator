@@ -110,7 +110,7 @@ function validateConfig(config) {
 function createOpenKit(config, deviceId) {
   if (OpenKit) {
     // Real OpenKit implementation
-    console.log('🔧 Initializing OpenKit SDK...');
+    console.log('🔧 Building OpenKit instance...');
     
     try {
       // OpenKit v4+ uses lowercase 'd' in withModelId
@@ -125,11 +125,11 @@ function createOpenKit(config, deviceId) {
         .withModelId(config.openkit.modelId) // Note: lowercase 'd' in v4+
         .build();
       
-      console.log('✅ OpenKit initialized successfully');
+      console.log('✓ OpenKit instance created (waiting for initialization...)');
       return openKitInstance;
       
     } catch (error) {
-      console.error('❌ OpenKit initialization failed:', error.message);
+      console.error('❌ Failed to create OpenKit instance:', error.message);
       console.warn('⚠️  Falling back to mock mode...\n');
       return new MockOpenKit(config, deviceId);
     }
@@ -258,10 +258,16 @@ async function simulateUserSession(config, userProfile, journey) {
     
     openKit.waitForInit(async (success) => {
       if (!success) {
-        console.error('❌ OpenKit initialization failed');
+        console.error('❌ OpenKit initialization failed (unable to connect to Dynatrace beacon)');
+        console.error('   Please verify:');
+        console.error('   1. Dynatrace URL is accessible from your network');
+        console.error('   2. Application ID exists in your Dynatrace environment');
+        console.error('   3. No firewall blocking outbound connections\n');
         resolve(false);
         return;
       }
+
+      console.log('✅ OpenKit initialization complete - capturing session data\n');
 
       try {
         // Create session
