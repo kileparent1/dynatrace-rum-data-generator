@@ -1,0 +1,45 @@
+{
+  "name": "kp-rumgen",
+  "version": "1.0.0",
+  "description": "Universal configuration-driven RUM session generator using Dynatrace OpenKit SDK",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/rum_session_generator.js",
+    "setup": "node src/setup_dynatrace_application.js",
+    "generate": "node src/rum_session_generator.js config/business_config.json",
+    "generate:harvard": "node src/rum_session_generator.js examples/harvard_pilgrim_config.json",
+    "test": "echo \"Running tests...\" && node src/rum_session_generator.js examples/harvard_pilgrim_config.json",
+    "lint": "echo \"No linter configured yet\"",
+    "format": "echo \"No formatter configured yet\""
+  },
+  "keywords": [
+    "dynatrace",
+    "openkit",
+    "rum",
+    "real-user-monitoring",
+    "session-generator",
+    "synthetic-data",
+    "performance-testing"
+  ],
+  "author": "Kile Parent",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kileparent1/dynatrace-rum-data-generator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kileparent1/dynatrace-rum-data-generator/issues"
+  },
+  "homepage": "https://github.com/kileparent1/dynatrace-rum-data-generator#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@dynatrace/openkit-js": "^1.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0"
+  }
+}

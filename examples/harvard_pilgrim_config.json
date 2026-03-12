@@ -1,0 +1,279 @@
+{
+  "metadata": {
+    "businessName": "Harvard Pilgrim",
+    "applicationName": "Member Portal",
+    "industry": "Healthcare",
+    "description": "RUM session generation for premium payment workflows",
+    "configVersion": "1.0.0",
+    "createdDate": "2025-01-15"
+  },
+  "dynatrace": {
+    "tenant": "fzw9231h",
+    "tenantUrl": "https://fzw9231h.sprint.dynatracelabs.com",
+    "applicationId": "CUSTOM_APPLICATION-XXXXXXXX",
+    "beaconUrl": "https://fzw9231h.sprint.dynatracelabs.com/mbeacon",
+    "applicationVersion": "2.1.0"
+  },
+  "openkit": {
+    "operatingSystem": "Windows 10",
+    "manufacturer": "Harvard Pilgrim Health Care",
+    "modelId": "MemberPortal_v2.1",
+    "logLevel": "INFO"
+  },
+  "business": {
+    "userProfiles": [
+      {
+        "name": "Sarah Johnson",
+        "email": "sarah.johnson@email.com",
+        "clientIP": "198.51.100.42",
+        "userType": "premium",
+        "customProperties": {
+          "memberId": "HP-89012345",
+          "memberType": "premium_member",
+          "planType": "Gold Premium HMO",
+          "enrollmentDate": "2020-01-15",
+          "segment": "high_value_engaged"
+        }
+      },
+      {
+        "name": "Michael Chen",
+        "email": "michael.chen@email.com",
+        "clientIP": "203.0.113.87",
+        "userType": "standard",
+        "customProperties": {
+          "memberId": "HP-90123456",
+          "memberType": "standard_member",
+          "planType": "Standard PPO",
+          "enrollmentDate": "2021-06-01",
+          "segment": "standard_active"
+        }
+      },
+      {
+        "name": "Emily Rodriguez",
+        "email": "emily.rodriguez@email.com",
+        "clientIP": "192.0.2.156",
+        "userType": "family",
+        "customProperties": {
+          "memberId": "HP-01234567",
+          "memberType": "family_member",
+          "planType": "Family Plan - Silver",
+          "enrollmentDate": "2019-03-20",
+          "dependents": 3,
+          "segment": "family_healthcare"
+        }
+      },
+      {
+        "name": "James Patterson",
+        "email": "james.patterson@email.com",
+        "clientIP": "198.51.100.91",
+        "userType": "senior",
+        "customProperties": {
+          "memberId": "HP-12345678",
+          "memberType": "senior_member",
+          "planType": "Medicare Advantage",
+          "enrollmentDate": "2018-11-10",
+          "ageGroup": "65+",
+          "segment": "senior_care"
+        }
+      }
+    ],
+    "userJourneys": {
+      "premiumPayment": {
+        "name": "Premium Payment Flow",
+        "description": "Member logs in and pays monthly premium",
+        "pages": [
+          {
+            "name": "Homepage",
+            "duration": 2500,
+            "actions": [
+              "view_hero_banner",
+              "check_notifications",
+              "click_login_button"
+            ]
+          },
+          {
+            "name": "Login",
+            "duration": 3000,
+            "actions": [
+              "enter_member_id",
+              "enter_password",
+              "click_sign_in",
+              "load_member_dashboard"
+            ]
+          },
+          {
+            "name": "Account Dashboard",
+            "duration": 2800,
+            "actions": [
+              "view_account_summary",
+              "check_balance",
+              "click_make_payment"
+            ]
+          },
+          {
+            "name": "Payment Setup",
+            "duration": 4000,
+            "actions": [
+              "select_payment_amount",
+              "enter_card_number",
+              "enter_billing_address",
+              "verify_payment_details"
+            ]
+          },
+          {
+            "name": "Payment Confirmation",
+            "duration": 2000,
+            "actions": [
+              "view_confirmation",
+              "download_receipt",
+              "return_dashboard"
+            ]
+          }
+        ]
+      },
+      "viewClaims": {
+        "name": "View Claims History",
+        "description": "Member reviews past medical claims",
+        "pages": [
+          {
+            "name": "Homepage",
+            "duration": 2000,
+            "actions": [
+              "view_hero_banner",
+              "click_login_button"
+            ]
+          },
+          {
+            "name": "Login",
+            "duration": 2500,
+            "actions": [
+              "enter_credentials",
+              "submit_login"
+            ]
+          },
+          {
+            "name": "Claims Center",
+            "duration": 3500,
+            "actions": [
+              "view_claims_list",
+              "filter_by_date",
+              "sort_by_amount",
+              "select_claim_details"
+            ]
+          },
+          {
+            "name": "Claim Details",
+            "duration": 3000,
+            "actions": [
+              "view_claim_breakdown",
+              "download_eob",
+              "view_provider_info"
+            ]
+          }
+        ]
+      },
+      "downloadCard": {
+        "name": "Download Insurance Card",
+        "description": "Member downloads digital insurance card",
+        "pages": [
+          {
+            "name": "Homepage",
+            "duration": 1800,
+            "actions": [
+              "click_login"
+            ]
+          },
+          {
+            "name": "Login",
+            "duration": 2500,
+            "actions": [
+              "authenticate"
+            ]
+          },
+          {
+            "name": "Member Profile",
+            "duration": 2200,
+            "actions": [
+              "view_profile",
+              "navigate_to_id_card"
+            ]
+          },
+          {
+            "name": "Insurance Card",
+            "duration": 2800,
+            "actions": [
+              "view_digital_card",
+              "click_download",
+              "save_to_wallet",
+              "email_card"
+            ]
+          }
+        ]
+      },
+      "findProvider": {
+        "name": "Find Healthcare Provider",
+        "description": "Search for in-network doctors",
+        "pages": [
+          {
+            "name": "Homepage",
+            "duration": 1500,
+            "actions": [
+              "click_find_doctor"
+            ]
+          },
+          {
+            "name": "Provider Search",
+            "duration": 3500,
+            "actions": [
+              "enter_location",
+              "select_specialty",
+              "apply_filters",
+              "search"
+            ]
+          },
+          {
+            "name": "Search Results",
+            "duration": 3000,
+            "actions": [
+              "view_results_list",
+              "sort_by_distance",
+              "read_reviews",
+              "select_provider"
+            ]
+          },
+          {
+            "name": "Provider Details",
+            "duration": 2500,
+            "actions": [
+              "view_provider_profile",
+              "check_availability",
+              "get_directions",
+              "save_favorite"
+            ]
+          }
+        ]
+      }
+    },
+    "errorSimulation": {
+      "enabled": true,
+      "errorRate": 0.03,
+      "errorTypes": [
+        "Payment Gateway Timeout",
+        "Session Expired",
+        "Invalid Member ID",
+        "Network Connection Lost",
+        "API Rate Limit Exceeded"
+      ]
+    },
+    "performanceMetrics": {
+      "pageLoadTimeRange": {
+        "min": 1200,
+        "max": 3500
+      },
+      "actionDurationRange": {
+        "min": 300,
+        "max": 1200
+      }
+    }
+  }
+}

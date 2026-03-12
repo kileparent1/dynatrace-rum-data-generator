@@ -1,0 +1,46 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "javascript.suggest.completeFunctionCalls": true,
+  "javascript.preferences.quoteStyle": "single",
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "files.exclude": {
+    "**/.git": false,
+    "**/node_modules": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true
+  },
+  "files.associations": {
+    "*.json": "jsonc"
+  },
+  "json.schemas": [
+    {
+      "fileMatch": ["config/*_config.json", "examples/*_config.json"],
+      "schema": {
+        "type": "object",
+        "properties": {
+          "metadata": { "type": "object" },
+          "dynatrace": { "type": "object" },
+          "openkit": { "type": "object" },
+          "business": { "type": "object" }
+        },
+        "required": ["metadata", "dynatrace", "business"]
+      }
+    }
+  ],
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.cursorBlinking": true,
+  "npm.enableScriptExplorer": true,
+  "debug.console.fontSize": 14,
+  "debug.console.lineHeight": 20
+}

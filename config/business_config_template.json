@@ -1,0 +1,122 @@
+{
+  "metadata": {
+    "businessName": "REPLACE_WITH_BUSINESS_NAME",
+    "applicationName": "REPLACE_WITH_APPLICATION_NAME",
+    "industry": "REPLACE_WITH_INDUSTRY",
+    "description": "Configuration template for RUM session generation",
+    "configVersion": "1.0.0"
+  },
+  "dynatrace": {
+    "tenant": "YOUR_TENANT_ID",
+    "tenantUrl": "https://YOUR_TENANT_ID.sprint.dynatracelabs.com",
+    "applicationId": "CUSTOM_APPLICATION-XXXXXXXXXXXXXXXX",
+    "beaconUrl": "https://YOUR_TENANT_ID.sprint.dynatracelabs.com/mbeacon",
+    "applicationVersion": "1.0.0"
+  },
+  "openkit": {
+    "operatingSystem": "Windows 10",
+    "manufacturer": "REPLACE_WITH_BUSINESS_NAME",
+    "modelId": "WebPortal_v1.0",
+    "logLevel": "INFO"
+  },
+  "business": {
+    "userProfiles": [
+      {
+        "name": "Sample User 1",
+        "email": "user1@example.com",
+        "clientIP": "192.168.1.100",
+        "userType": "premium",
+        "customProperties": {
+          "memberType": "premium_member",
+          "planType": "Premium Plan",
+          "segment": "high_value"
+        }
+      },
+      {
+        "name": "Sample User 2",
+        "email": "user2@example.com",
+        "clientIP": "192.168.1.101",
+        "userType": "standard",
+        "customProperties": {
+          "memberType": "standard_member",
+          "planType": "Standard Plan",
+          "segment": "standard"
+        }
+      }
+    ],
+    "userJourneys": {
+      "primaryFlow": {
+        "name": "Primary User Journey",
+        "description": "Main application workflow",
+        "pages": [
+          {
+            "name": "Home",
+            "duration": 2000,
+            "actions": [
+              "view_hero",
+              "scroll"
+            ]
+          },
+          {
+            "name": "Login",
+            "duration": 3000,
+            "actions": [
+              "fill_username",
+              "fill_password",
+              "click_submit"
+            ]
+          },
+          {
+            "name": "Dashboard",
+            "duration": 2500,
+            "actions": [
+              "view_content",
+              "check_status"
+            ]
+          }
+        ]
+      },
+      "secondaryFlow": {
+        "name": "Secondary User Journey",
+        "description": "Alternative workflow",
+        "pages": [
+          {
+            "name": "Home",
+            "duration": 1500,
+            "actions": [
+              "click_link"
+            ]
+          },
+          {
+            "name": "Search",
+            "duration": 3000,
+            "actions": [
+              "enter_query",
+              "click_search",
+              "view_results"
+            ]
+          }
+        ]
+      }
+    },
+    "errorSimulation": {
+      "enabled": true,
+      "errorRate": 0.02,
+      "errorTypes": [
+        "Network timeout",
+        "Resource not found",
+        "API error"
+      ]
+    },
+    "performanceMetrics": {
+      "pageLoadTimeRange": {
+        "min": 1000,
+        "max": 3000
+      },
+      "actionDurationRange": {
+        "min": 200,
+        "max": 1000
+      }
+    }
+  }
+}
