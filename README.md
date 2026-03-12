@@ -10,6 +10,7 @@ A business-agnostic Real User Monitoring (RUM) session generator that creates sy
 
 ## 🌟 Key Features
 
+- **🤖 Automated Setup**: Creates Dynatrace Custom Applications via API (no UI needed!)
 - **Configuration-Driven**: Change business without touching code
 - **OpenKit SDK**: Official Dynatrace SDK (fully supported)
 - **Interactive Setup**: Wizard-guided configuration
@@ -57,7 +58,8 @@ See [QUICKSTART.md](docs/QUICKSTART.md) for detailed instructions.
 
 - **Node.js**: Version 18.0.0 or higher ([Download](https://nodejs.org/))
 - **Dynatrace**: Access to a Dynatrace environment
-- **API Token**: With `settings.write` and `settings.read` permissions
+- **API Token**: With `WriteConfig` scope (to automatically create applications)
+  - Or any valid token for manual setup fallback
 
 ### Install
 
@@ -83,10 +85,17 @@ Run the interactive setup wizard:
 npm run setup
 ```
 
-This will:
-- Validate your Dynatrace connection
-- Guide you through creating a Custom Application
-- Generate your configuration file
+**What it does:**
+- ✅ Validates your Dynatrace connection
+- ✅ **Automatically creates Custom Application via API**
+- ✅ Configures OpenKit beacon settings
+- ✅ Generates complete `business_config.json`
+
+**No manual UI steps required!** The wizard uses the Dynatrace Configuration API to create applications automatically.
+
+> **Note:** If your token lacks `WriteConfig` scope, the wizard will fall back to manual creation with guided UI steps.
+> 
+> See [docs/API_SETUP.md](docs/API_SETUP.md) for details on automated setup.
 
 ### 2. Generate Sessions
 
@@ -191,6 +200,7 @@ VS Code will prompt you to install recommended extensions:
 
 ### Getting Started
 - **[Quick Start Guide](docs/QUICKSTART.md)** - Get running in 5 minutes
+- **[Automated API Setup](docs/API_SETUP.md)** - How automatic Custom Application creation works
 - **[Complete Documentation](docs/README_UNIVERSAL_RUM.md)** - Full API reference and guides
 
 ### Technical

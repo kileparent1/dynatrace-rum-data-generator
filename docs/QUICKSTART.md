@@ -5,29 +5,31 @@
 ### ✅ Prerequisites
 - Node.js installed
 - Dynatrace environment access
-- API token (any valid token - setup wizard only validates connection)
+- API token with **WriteConfig** scope (to create applications automatically)
+  - Or any valid token for manual setup fallback
 
 ---
 
 ## Step 1: Run Setup Wizard (2 minutes)
 
 ```bash
-node setup_dynatrace_application.js
+node src/setup_dynatrace_application.js
 ```
 
 **You'll be asked for:**
 1. Dynatrace tenant ID (e.g., `fzw9231h`)
-2. API token
+2. API token (with WriteConfig scope)
 3. Business name (e.g., `Harvard Pilgrim`)
 4. Application name (e.g., `Member Portal`)
 5. Industry (e.g., `Healthcare`)
 
-**Then do this manually:**
-1. Create Custom Application in Dynatrace UI
-2. Copy the Application ID
-3. Paste it back into the wizard
+**What happens:**
+- ✅ Validates connection to Dynatrace
+- ✅ **Automatically creates Custom Application via API**
+- ✅ Generates complete configuration with Application ID
+- ⚠️ Falls back to manual creation if token lacks permissions
 
-**Result:** `business_config.json` created ✓
+**Result:** `business_config.json` created with real Application ID ✓
 
 ---
 
@@ -211,7 +213,7 @@ You'll see:
 
 ```bash
 # Setup (run once)
-node setup_dynatrace_application.js
+node src/setup_dynatrace_application.js
 
 # Install SDK (run once)
 npm install @dynatrace/openkit-js
@@ -231,7 +233,7 @@ node rum_session_generator.js my_config.json     # Before npm install
 ### "Configuration file not found"
 ```bash
 # Run setup first
-node setup_dynatrace_application.js
+node src/setup_dynatrace_application.js
 ```
 
 ### "OpenKit SDK not found"
@@ -240,9 +242,9 @@ npm install @dynatrace/openkit-js
 ```
 
 ### "Missing required configuration field: dynatrace.applicationId"
-1. Create Custom Application in Dynatrace UI
-2. Copy the Application ID
-3. Update config: `"applicationId": "CUSTOM_APPLICATION-..."`
+1. Run setup wizard: `node src/setup_dynatrace_application.js`
+2. Ensure API token has **WriteConfig** scope
+3. Or manually create in Dynatrace UI and update config
 
 ### No sessions in Dynatrace
 1. Wait 2-3 minutes for data ingestion
@@ -275,7 +277,7 @@ See `README_UNIVERSAL_RUM.md` for:
 **Ready to start?**
 
 ```bash
-node setup_dynatrace_application.js
+node src/setup_dynatrace_application.js
 ```
 
 **Questions?**
