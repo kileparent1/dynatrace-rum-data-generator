@@ -320,7 +320,7 @@ async function simulateUserSession(config, userProfile, journey) {
           // Simulate user actions on page
           if (page.actions && page.actions.length > 0) {
             for (const actionName of page.actions) {
-              const userAction = pageAction.enterAction(`User: ${actionName}`);
+              console.log(`  [Action] ▶ ${actionName}`);
 
               const actionDuration = config.business.performanceMetrics?.actionDurationRange
                 ? Math.floor(
@@ -331,8 +331,9 @@ async function simulateUserSession(config, userProfile, journey) {
 
               await sleep(actionDuration / 4);
 
-              userAction.reportValue('Action Duration', actionDuration);
-              userAction.leaveAction();
+              // Report as events on the page action (JS OpenKit doesn't support nested actions)
+              pageAction.reportEvent(`User Action: ${actionName}`);
+              pageAction.reportValue(`${actionName} Duration`, actionDuration);
             }
           }
 

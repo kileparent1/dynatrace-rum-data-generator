@@ -10,7 +10,7 @@ const https = require('https');
 const fs = require('fs');
 
 // Load configuration
-const configPath = process.argv[2] || './examples/harvard_pilgrim_config.json';
+const configPath = process.argv[2] || './business_config.json';
 
 if (!fs.existsSync(configPath)) {
   console.error(`❌ Configuration file not found: ${configPath}`);

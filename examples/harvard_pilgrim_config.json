@@ -10,8 +10,8 @@
   "dynatrace": {
     "tenant": "fzw9231h",
     "tenantUrl": "https://fzw9231h.sprint.dynatracelabs.com",
-    "applicationId": "CUSTOM_APPLICATION-2EBA8ECA90C74ECC",
-    "beaconUrl": "https://fzw9231h.sprint.dynatracelabs.com/mbeacon",
+    "applicationId": "72774fd5-9655-470f-a1a5-ee6bb9f46df9",
+    "beaconUrl": "https://fzw9231h.sprint.dynatracelabs.com/mbeacon/fzw9231h",
     "applicationVersion": "2.1.0"
   },
   "openkit": {
